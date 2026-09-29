@@ -231,7 +231,7 @@ details.model[open] summary{margin-bottom:10px}
     <div class="eyebrow">书写规范</div>
     <h2>중국어 원고지 작성 규칙</h2>
     <p class="lead">가로쓰기 기준입니다. 한국어 원고지와 가장 크게 다른 점은 <b>단락 첫머리 두 칸 비우기</b>와 <b>띄어쓰기 없음</b>입니다. 예시에서 초록색 칸은 눈여겨볼 칸, 빨간색 칸은 틀린 칸입니다. 카드 오른쪽 위 표시는 규칙의 근거입니다: <b>국가표준</b>(GB/T 15834-2011에 있는 규칙), <b>원고지 관례</b>(표준에는 없지만 교육·시험에서 널리 쓰는 방식), <b>표준 + 관례</b>(둘이 섞인 규칙).</p>
-    <div class="rules" id="rules"></div>
+    <div class="rules" id="ruleList"></div>
     <div class="sources">
       <p><b>근거 자료 (국가표준)</b><br>
       · <a href="https://std.samr.gov.cn/gb/search/gbDetailed?id=71F772D7FE25D3A7E05397BE0A0AB82A" target="_blank" rel="noopener">GB/T 15834-2011《标点符号用法》</a> (전국표준정보공공서비스플랫폼): 5장 부호의 위치와 칸 수, 부록 B.3 순서 번호. <a href="https://people.ubuntu.com/~happyaron/l10n/GB(T)15834-2011.html" target="_blank" rel="noopener">전문 보기</a><br>
@@ -247,7 +247,7 @@ details.model[open] summary{margin-bottom:10px}
     <div class="eyebrow">练习 · 퀴즈</div>
     <h2>틀린 칸 찾기 &amp; 바른 것 고르기</h2>
     <p class="lead">주제를 하나 골라 풀어 보세요. 원고지 그림에서 규칙에 어긋난 칸을 클릭하거나, 바르게 쓴 보기를 고르세요. 답을 고르면 해설과 고친 원고지가 나옵니다.</p>
-    <div class="quiz" id="quiz"></div>
+    <div class="quiz" id="quizBox"></div>
   </section>
 
   <!-- WRITE -->
@@ -534,7 +534,7 @@ const RULES=[
    ex:[{k:'bad',cols:10,rows:['__我爱唱歌!,也爱跳','舞!.']},{k:'good',cols:10,rows:['__我爱唱歌!，也爱跳','舞!。']}]},
 ];
 function renderRules(){
-  const host=document.getElementById('rules');
+  const host=document.getElementById('ruleList');
   host.innerHTML='';
   RULES.forEach((ru,i)=>{
     const card=document.createElement('article');card.className='rule';card.dataset.i=i;
@@ -566,11 +566,11 @@ function renderRules(){
   applyRule();
 }
 let ruleSel='all';
-function applyRule(){document.querySelectorAll('#rules .rule').forEach(c=>c.hidden=!(ruleSel==='all'||c.dataset.i===ruleSel))}
+function applyRule(){document.querySelectorAll('#ruleList .rule').forEach(c=>c.hidden=!(ruleSel==='all'||c.dataset.i===ruleSel))}
 function showRule(sel){
   ruleSel=String(sel);store.set('gaozhi-rule',ruleSel);applyRule();
 }
-function drawRules(){document.querySelectorAll('#rules .rule:not([hidden]) .ex').forEach(b=>b._draw&&b._draw())}
+function drawRules(){document.querySelectorAll('#ruleList .rule:not([hidden]) .ex').forEach(b=>b._draw&&b._draw())}
 
 /* ---------- 퀴즈 ---------- */
 const QUIZ=[
@@ -666,7 +666,7 @@ function renderPicker(host){
   host.querySelectorAll('.qset').forEach(b=>b.onclick=()=>{startSet(b.dataset.id);renderQuiz();updateSide()});
 }
 function renderQuiz(){
-  const host=document.getElementById('quiz');
+  const host=document.getElementById('quizBox');
   if(!Q.set){renderPicker(host);return}
   if(Q.answeredAt===Q.i){Q.i++;Q.answered=false;Q.answeredAt=-1}
   const N=Q.list.length, st=Q.set;
@@ -724,7 +724,7 @@ function feedback(hit,it){
   <div class="row-end" style="margin-top:12px"><button class="btn primary" id="qNext">${Q.i===Q.list.length-1?'결과 보기':'다음 문제'}</button></div>`;
   if(it.fix){const p=parse(it.fix,it.cols);renderSheet(fb.querySelector('#qFix'),p.rows,{cols:it.cols,marks:markMap(p.marks,'hi'),max:32})}
   const nx=fb.querySelector('#qNext'); nx.focus({preventScroll:true});
-  nx.onclick=()=>{Q.i++;Q.answered=false;Q.answeredAt=-1;renderQuiz();document.getElementById('quiz').scrollIntoView({block:'nearest'})};
+  nx.onclick=()=>{Q.i++;Q.answered=false;Q.answeredAt=-1;renderQuiz();document.getElementById('quizBox').scrollIntoView({block:'nearest'})};
 }
 
 /* ---------- 직접 쓰기 ---------- */
@@ -972,7 +972,9 @@ renderRules();
 buildSide();
 loadEx(0);
 const h=(location.hash||'').slice(1);
+if('scrollRestoration' in history)history.scrollRestoration='manual';
 show(['rules','quiz','write','auto'].includes(h)?h:'rules');
+window.scrollTo(0,0);window.addEventListener('load',()=>window.scrollTo(0,0));
 </script>
 
 </body></html>
